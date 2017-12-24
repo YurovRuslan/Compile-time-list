@@ -27,9 +27,29 @@ struct Length<NIL> {
     static constexpr uint32_t length = 0;
 };
 
+template<class List>
+using Head = typename List::Head;
+
+template<class List>
+using Tail = typename List::Tail;
+
+template<class List, uint32_t N>
+struct Nth {
+	typedef Tail<List> tail;
+	typedef class Nth<tail, N-1>::value value;
+};
+
+template<class List>
+struct Nth<List, 0> {
+	typedef Head<List> value;
+};
+
 int main() {
-    typedef List<Int<1>, List<Int<2>>> list;
+    typedef List<Int<1>, List<Int<2>, List<Int<3>, List<Int<4>, List<Int<5>>>>>> list;
     typedef Length<list> list_length;
-    std::cout << list_length::length;
+    std::cout << "List length: " << list_length::length << std::endl;
+    std::cout << "List head: " << Head<list>::value << std::endl;
+    std::cout << "List second element: " << Head<Tail<list>>::value << std::endl;
+    std::cout << "List third element: " << Nth<list, 2>::value::value << std::endl;
     return 0;
 }
