@@ -65,6 +65,24 @@ struct IsInList<Elem, Nil> {
 	static constexpr bool result = false;
 };
 
+template<class Elem, class OldList = Nil>
+struct Prepand {
+	typedef List<Elem, OldList> result;
+};
+
+template<class Elem, class OldList>
+struct Append {
+	typedef Head<OldList> CurHead;
+	typedef Tail<OldList> CurTail;
+	typedef typename Append<Elem, CurTail>::result Next;
+	typedef List<CurHead, Next> result;
+};
+
+template<class Elem>
+struct Append<Elem, Nil> {
+	typedef List<Elem> result;
+};
+
 int main() {
     typedef List<Int<1>, List<Int<2>, List<Int<3>, List<Int<4>, List<Int<5>>>>>> list;
     typedef Length<list> list_length;
@@ -72,6 +90,10 @@ int main() {
     std::cout << "List head: " << Head<list>::value << std::endl;
     std::cout << "List second element: " << Head<Tail<list>>::value << std::endl;
     std::cout << "List third element: " << Nth<list, 2>::value::value << std::endl;
-    std::cout << "List third element: " << IsInList<Int<3>, list>::result << std::endl;
+    std::cout << "Is third element in a list: " << IsInList<Int<3>, list>::result << std::endl;
+	std::cout << "Sixth element after append: " <<
+            Nth<Append<Int<10>, list>::result, 5>::value::value << std::endl;
+	std::cout << "First element after prepand: " <<
+			Nth<Prepand<Int<0>, list>::result, 0>::value::value << std::endl;
     return 0;
 }
